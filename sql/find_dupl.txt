@@ -1,0 +1,17 @@
+/*
+Поиск дубликатов в таблице БД
+Столбцы таблицы:
+uid, year, month, type_prod, period, costs
+uid - уникальный идентификатор строки
+*/
+
+select q.year, q.month, sum(cnt_dupl) as sum_cnt_dupl
+from 
+    (select year, month, count(*) as cnt_dupl
+     from schema.table
+     group by year, month, type_prod, period, costs
+     having count(*) > 1
+     ) as q
+group by year, month
+order by year desc, month desc
+;
