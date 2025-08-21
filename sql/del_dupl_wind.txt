@@ -1,0 +1,30 @@
+/*
+Поиск дубликатов в таблице
+Удаление более поздних строк
+
+Схема и таблица:
+public.monthly_costs_x
+
+Столбцы таблицы:
+uid, year, month, type_prod, period, costs
+uid - уникальный идентификатор строки
+*/
+
+with dupl as ( 
+   select
+      uid, 
+      year, 
+      month, 
+      type_prod, 
+      period, 
+      costs,
+      row_number() over (partition by year, month, type_prod, period, costs order by period desc) as rn_d
+   from public.monthly_costs_x
+             )
+
+delete 
+from public.monthly_costs_x
+where uid in ( select uid 
+               from dupl where rn_d > 1
+             )
+;
